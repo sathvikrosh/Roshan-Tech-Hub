@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roshan Tech Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; transition: all 0.3s ease; }
+
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    .pulse { animation: pulse 2.6s infinite ease-in-out; }
+    .fade-in { animation: fadeIn 1.2s ease forwards; }
+
+    .product-card:hover {
+      transform: scale(1.03);
+      transition: transform 0.2s ease;
+    }
+
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(4deg); }
+    }
+    .animate-spin-slow { animation: spin-slow 12s linear infinite; }
+    .animate-wiggle { animation: wiggle 2.5s ease-in-out infinite; }
+    .flicker { animation: flicker 2s infinite ease-in-out; }
+    .glow { text-shadow: 0 0 10px #fff, 0 0 20px #3b82f6, 0 0 40px #6366f1; }
+  </style>
+
+  <!-- 🌐 PWA Support -->
+<!-- PWA Meta -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e3a8a">
+<link rel="apple-touch-icon" href="brand logo.png">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log("✅ Service Worker Registered", reg))
+      .catch(err => console.error("❌ Service Worker registration failed:", err));
+  }
+</script>
+
+
+</head>
+<body class="bg-white text-gray-800">
+
+<!-- 🌟 WELCOME SCREEN (Shared with login fade-in) -->
+<div id="welcomeScreen" class="fixed inset-0 z-50 flex flex-col items-center justify-center text-white text-center bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-900 overflow-hidden transition-opacity duration-1000 backdrop-blur-xl">
+
+  <!-- 🔄 Background Icons -->
+  <div class="absolute inset-0 opacity-10 pointer-events-none">
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/cpu.png" class="absolute top-10 left-10 animate-pulse w-12" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/artificial-intelligence.png" class="absolute top-24 right-12 animate-bounce w-14" />
+    <img src="https://img.icons8.com/ios-glyphs/100/ffffff/laptop.png" class="absolute bottom-16 left-24 animate-spin-slow w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/code.png" class="absolute bottom-10 right-20 animate-wiggle w-12" />
+    <img src="https://img.icons8.com/ios/100/ffffff/robot-2.png" class="absolute top-12 left-1/4 animate-bounce w-12" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/database.png" class="absolute top-36 left-2 animate-pulse w-10" />
+    <img src="https://img.icons8.com/ios/100/ffffff/cloud.png" class="absolute bottom-28 right-1/4 animate-wiggle w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/microchip.png" class="absolute bottom-36 left-16 animate-spin-slow w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/settings.png" class="absolute top-1/4 right-1/3 animate-pulse w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/smartphone-tablet.png" class="absolute bottom-10 left-1/3 animate-bounce w-12" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/wifi.png" class="absolute bottom-1/2 right-10 animate-wiggle w-8" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/hard-disk.png" class="absolute top-16 right-1/4 animate-pulse w-9" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/source-code.png" class="absolute bottom-1/5 right-1/2 animate-wiggle w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/chatbot.png" class="absolute top-1/2 left-12 animate-spin-slow w-11" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/web.png" class="absolute bottom-1/2 left-1/3 animate-bounce w-10" />
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/keyboard.png" class="absolute top-2/3 right-10 animate-pulse w-12" />
+  </div>
+
+  <!-- 🚀 Welcome Logo and Text -->
+  <img src="brand logo.png" alt="Roshan Logo" id="logoImg" class="w-28 h-28 mb-4 rounded-full shadow-xl border-4 border-white opacity-0 scale-50 transition-all duration-1000 ease-out" />
+  <h1 class="text-4xl md:text-5xl font-extrabold flicker glow">⚡ Roshan Tech Hub ⚡</h1>
+  <p id="typingText" class="mt-3 text-sm text-blue-100 italic h-6"></p>
+  <button onclick="skipWelcome()" class="mt-6 px-4 py-2 bg-white text-blue-900 rounded hover:bg-blue-100 shadow-lg">Skip →</button>
+
+  <!-- 🎧 Background Music -->
+  <audio autoplay muted id="bgMusic">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-ambient-wave-1110.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- 🔐 LOGIN BLOCK (initially hidden, fades in after welcome) -->
+  <div id="loginFormContainer" class="hidden w-full max-w-md mx-auto p-6 bg-white/20 backdrop-blur-lg rounded-xl shadow-xl border border-white/30 text-white mt-10">
+    <div class="text-center mb-6">
+      <img src="brand logo.png" alt="Roshan Logo" class="mx-auto w-20 h-20 mb-3 rounded-full shadow-lg border-4 border-white">
+      <h2 class="text-3xl font-bold glow">Roshan Tech Hub</h2>
+      <p class="text-sm text-gray-200 mt-1 italic">Login to unlock future tech 🚀</p>
+    </div>
+    <form id="loginForm" class="flex flex-col gap-4">
+      <input id="username" type="text" placeholder="Your Name" required class="p-3 rounded-md border border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-400" />
+      <input id="mobile" type="tel" placeholder="Mobile Number" pattern="[0-9]{10}" required class="p-3 rounded-md border border-gray-300 text-gray-800 focus:ring-2 focus:ring-blue-400" />
+      <button type="submit" class="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-all">🔓 Login to Continue</button>
+    </form>
+    <p class="text-xs text-gray-100 text-center mt-4">We never share your details 🔒</p>
+  </div>
+</div>
+
+<!-- 🔄 Welcome Screen Logic -->
+<script>
+  const sloganText = "Powering Dreams. Inspiring Innovation.";
+  let i = 0;
+  const typingElement = document.getElementById("typingText");
+  const logo = document.getElementById("logoImg");
+
+  const typingInterval = setInterval(() => {
+    if (i < sloganText.length) {
+      typingElement.textContent += sloganText.charAt(i);
+      i++;
+    } else {
+      clearInterval(typingInterval);
+    }
+  }, 70);
+
+  setTimeout(() => {
+    logo.classList.remove("opacity-0", "scale-50");
+    logo.classList.add("opacity-100", "scale-100");
+  }, 300);
+
+  function skipWelcome() {
+    hideWelcome();
+  }
+
+  function hideWelcome() {
+    document.getElementById("loginFormContainer").classList.remove("hidden");
+    document.getElementById("loginFormContainer").classList.add("fade-in");
+
+    // Optionally hide welcome text/logo
+    typingElement.style.display = 'none';
+    document.querySelector('#logoImg').style.display = 'none';
+    document.querySelector('#welcomeScreen button').style.display = 'none';
+    document.querySelector('#welcomeScreen h1').style.display = 'none';
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(hideWelcome, 6000);
+  });
+</script>
+<!-- 🌐 MAIN HOMEPAGE -->
+<div id="mainContent" class="hidden">
+
+<!-- 🏠 HOMEPAGE HEADER with Centered Search Bar and Menu -->
+<section class="bg-gradient-to-r from-indigo-900 to-purple-900 text-white py-6 px-4 md:px-10 shadow-md">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 items-center gap-6">
+
+    <!-- 🔰 Left: Logo + Hamburger -->
+    <div class="flex flex-col items-start gap-2">
+      <div class="flex items-center gap-3">
+        <img src="brand logo.png" alt="Roshan Logo" class="w-14 h-14 rounded-full border-4 border-white shadow" />
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold">Roshan Tech Hub</h1>
+          <p class="text-xs md:text-sm italic text-blue-100">Empowering Tech, Empowering People</p>
+        </div>
+      </div>
+
+      <!-- 🍔 Hamburger Menu -->
+      <div class="relative mt-2">
+        <button id="menuToggle" class="text-white focus:outline-none p-2 rounded hover:bg-blue-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div id="menuBlock" class="absolute mt-2 bg-blue-800 text-white rounded-lg shadow-lg w-48 p-3 hidden z-50">
+          <a href="#" class="block px-3 py-2 rounded hover:bg-blue-700">🏠 Home</a>
+          <a href="#productGrid" class="block px-3 py-2 rounded hover:bg-blue-700">🛍️ Categories</a>
+          <a href="#about" class="block px-3 py-2 rounded hover:bg-blue-700">📘 About</a>
+          <a href="#contact" class="block px-3 py-2 rounded hover:bg-blue-700">📞 Contact</a>
+          <a href="#support" class="block px-3 py-2 rounded hover:bg-blue-700">🛠️ Support</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🔍 Center: Search Bar with Icon Button -->
+<div class="flex justify-center items-center gap-2">
+  <input type="text" id="searchInput"
+    placeholder="🔍 Search products..."
+    class="w-full md:w-96 px-4 py-2 rounded bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow" />
+  <button onclick="searchProducts()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    🔍
+  </button>
+</div>
+
+
+    <!-- 🙋‍♂️ Right: Quote + Welcome -->
+    <div class="text-right">
+      <p class="text-sm italic text-blue-100 mb-1">“A tribute to Roshan's legacy — Building a smarter future together.”</p>
+      <p class="text-base md:text-lg font-semibold">Hi <span id="userName">Guest</span>, welcome to your tech hub! 🚀</p>
+    </div>
+  </div>
+</section>
+
+<!-- 🔎 SEARCH RESULTS SECTION (Displays below header, looks like product grid) -->
+</section> <!-- CLOSES your header -->
+
+<!-- ✅ NOW paste this here, after header -->
+<section id="searchResults" class="hidden p-6">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-2xl font-bold text-blue-800">Search Results</h2>
+    <button onclick="backToHome()" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300 text-sm">← Back to Home</button>
+  </div>
+  <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+</section>
+
+<!-- 🛒 CART MODAL -->
+<div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg relative">
+    <h2 class="text-2xl font-bold mb-4 text-blue-800">Your Cart</h2>
+    <div id="cartItems" class="space-y-4 max-h-64 overflow-y-auto text-gray-700"></div>
+    <div class="mt-4 text-right">
+      <button onclick="closeCart()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- 👤 USER PROFILE MODAL -->
+<div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6 w-full max-w-sm shadow-lg text-center">
+    <h2 class="text-2xl font-bold text-blue-800 mb-4">Your Profile</h2>
+    <p><strong>Name:</strong> <span id="profileName">Guest</span></p>
+    <p><strong>Mobile:</strong> <span id="profileMobile">N/A</span></p>
+    <button onclick="closeProfile()" class="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Close</button>
+  </div>
+</div>
+
+<div class="mt-2 flex justify-end gap-2">
+  <button onclick="openProfile()" class="bg-gray-200 text-sm text-black px-3 py-1 rounded hover:bg-gray-300">👤 Profile</button>
+  <button onclick="openCart()" class="bg-gray-200 text-sm text-black px-3 py-1 rounded hover:bg-gray-300">🛒 View Cart</button>
+</div>
+
+
+<!-- 🔥 Store Intro Blocks (Paste after header) -->
+<section class="bg-gray-100 py-8 px-4">
+  <!-- Banner Image -->
+  <div class="max-w-6xl mx-auto">
+    <img src="webanner.png" alt="Tech Store Banner" class="w-full rounded-xl shadow-lg" />
+  </div>
+</section>
+
+<section class="bg-white py-10 px-4 text-center">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold mb-4 text-blue-900">Explore Premium Tech Essentials</h2>
+    <p class="text-gray-600 mb-6">From smart gadgets to AI tools and software subscriptions — everything you need to stay ahead in tech, curated for you.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+      <div class="bg-blue-50 p-6 rounded shadow hover:shadow-md transition">
+        <img src="https://img.icons8.com/fluency/96/laptop.png" class="mx-auto mb-3" />
+        <h3 class="font-semibold text-lg text-blue-800">Latest Gadgets</h3>
+        <p class="text-sm text-gray-600">Top-rated devices including laptops, smartphones, wearables & more.</p>
+      </div>
+      <div class="bg-purple-50 p-6 rounded shadow hover:shadow-md transition">
+        <img src="https://img.icons8.com/fluency/96/artificial-intelligence.png" class="mx-auto mb-3" />
+        <h3 class="font-semibold text-lg text-purple-800">AI & Automation</h3>
+        <p class="text-sm text-gray-600">Powerful tools to boost productivity using AI-powered platforms.</p>
+      </div>
+      <div class="bg-green-50 p-6 rounded shadow hover:shadow-md transition">
+        <img src="https://www.midaxo.com/wp-content/uploads/2022/12/incorporate-synergy-planning-hea.jpg" class="mx-auto mb-3" />
+        <h3 class="font-semibold text-lg text-green-800">Pro Software</h3>
+        <p class="text-sm text-gray-600">Affordable & professional-grade software for design, dev & more.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+  <!-- 👋 Welcome Message (Redundant if already above, optional to remove) -->
+  <!--
+  <section class="text-center mt-6">
+    <h2 class="text-xl font-semibold">Welcome, <span id="userName">Guest</span>!</h2>
+    <p class="text-gray-600">Find the best tech tools & gadgets below 👇</p>
+  </section>
+  -->
+
+  <!-- 🗂️ Product Categories -->
+  <section class="text-center mt-6">
+    <h3 class="text-lg font-bold mb-2">Categories</h3>
+    <div class="flex flex-wrap justify-center gap-3">
+      <button onclick="filterCategory('All')" class="bg-blue-600 text-white px-4 py-2 rounded">All</button>
+      <button onclick="filterCategory('Gadgets')" class="bg-blue-600 text-white px-4 py-2 rounded">Gadgets</button>
+      <button onclick="filterCategory('Software')" class="bg-blue-600 text-white px-4 py-2 rounded">Software</button>
+      <button onclick="filterCategory('AI Tools')" class="bg-blue-600 text-white px-4 py-2 rounded">AI Tools</button>
+    </div>
+  </section>
+
+  <!-- 🛒 Product Cards -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6" id="productGrid"></section>
+  <p class="text-sm text-yellow-600 mt-1">🌟 Rated 4.5/5 by 200+ users</p>
+
+
+  <!-- 📌 Footer -->
+  <footer class="text-center text-sm text-gray-500 py-4 border-t">
+    Made with ❤️ for Roshan. Press <b>D</b> for Dark Mode.
+  </footer>
+</div>
+
+
+<!-- 🔊 Sound Effects -->
+<audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-fast-double-click-on-mouse-275.wav"></audio>
+
+<!-- 🧠 Product + Login Logic -->
+<script>
+  const user = JSON.parse(localStorage.getItem("flashUser"));
+  if (user?.name) document.getElementById("userName").textContent = user.name;
+
+  
+
+  let dark = false;
+  document.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() === "d") {
+      dark = !dark;
+      document.body.classList.toggle("bg-gray-900", dark);
+      document.body.classList.toggle("text-white", dark);
+    }
+  });
+
+  const products = [
+    { name: "Lenovo Laptop Slim 5", price: "₹1,60,000", image: "https://m.media-amazon.com/images/I/816n9hBWHEL._SL1500_.jpg", category: "Gadgets", link: "https://amzn.in/d/clLYCV5" },
+    { name: "Canva Pro", price: "Free Trial", image: "https://ce8f609cc.cloudimg.io/crop/1200x630/foil1.95/https://static.canva.com/static/images/fb_cover-1.jpg", category: "Software", link: "https://partner.canva.com/your-affiliate" },
+    { name: "ChatGPT Pro", price: "₹1,800/mo", image: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg", category: "AI Tools", link: "https://chat.openai.com/" },
+    { name: "Bluetooth Neckband", price: "₹799", image: "https://rukmini1.flixcart.com/image/300/300/xif0q/headphone/7/1/r/bluetooth-neckband-50h-playback-splash-sweat-proof-passive-noise-original-imagqgc3yyzzekt6.jpeg", category: "Gadgets", link: "https://amzn.to/your-affiliate-neckband" },
+    { name: "iPhone 16 Pro Max", price: "₹1,49,999", image: "https://xmobile.lk/wp-content/uploads/2024/09/Apple-iPhone-16-5.png", category: "Gadgets", link: "https://amzn.in/d/irNoFUo" },
+    { name: "Samsung Galaxy", price: "₹80,000", image: "https://pixelnerd.com.br/wp-content/uploads/2023/08/Samsung-Galaxy-S23-Ultra-1.jpg", category: "Software", link: "https://partner.canva.com/your-affiliate" },
+  ];
+
+ function renderProducts(filtered = products) {
+  const container = document.getElementById("productGrid");
+  container.innerHTML = "";
+  filtered.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card border p-4 rounded shadow text-center bg-white";
+    card.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" class="h-40 mx-auto object-contain mb-3">
+      <h3 class="font-bold">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">Category: ${p.category}</p>
+      <p class="text-lg font-semibold text-blue-700 mb-1">${p.price}</p>
+      <span class="inline-block bg-red-500 text-white text-xs px-2 py-1 rounded-full">🔥 Offer</span>
+      <div class="flex justify-center gap-2 mt-2">
+        <button onclick='addToCart(${JSON.stringify(p)})' class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">🛒 Add to Cart</button>
+        <a href="${p.link}" target="_blank">
+          <button onclick="playSound()" class="bg-yellow-400 px-3 py-1 rounded hover:bg-yellow-500 text-sm">Buy Now</button>
+        </a>
+        <button onclick="shareProduct('${p.name}', '${p.link}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">🔗 Share</button>
+      </div>
+      <p class="text-sm text-yellow-600 mt-1">🌟 Rated 4.5/5 by 200+ users</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+  function filterCategory(cat) {
+    if (cat === "All") return renderProducts();
+    renderProducts(products.filter(p => p.category === cat));
+  }
+
+  function playSound() {
+    document.getElementById("clickSound").play();
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("username").value.trim();
+    const mobile = document.getElementById("mobile").value.trim();
+    localStorage.setItem("flashUser", JSON.stringify({ name, mobile }));
+    document.getElementById("welcomeScreen").classList.add("hidden");
+    document.getElementById("mainContent").classList.remove("hidden");
+    document.getElementById("userName").textContent = name;
+    renderProducts();
+  });
+
+
+
+// 🔄 Toggle Menu
+document.getElementById("menuToggle").addEventListener("click", () => {
+  const menu = document.getElementById("menuBlock");
+  menu.classList.toggle("hidden");
+});
+
+</script>
+
+<script>
+
+function searchProducts() {
+  const query = document.getElementById("searchInput").value.toLowerCase().trim();
+  const results = products.filter(p =>
+    p.name.toLowerCase().includes(query) ||
+    p.category.toLowerCase().includes(query)
+  );
+
+  if (!query) return;
+
+  // Hide main product grid
+  document.getElementById("productGrid").classList.add("hidden");
+  document.getElementById("searchResults").classList.remove("hidden");
+
+  const container = document.getElementById("resultsGrid");
+  container.innerHTML = "";
+
+  if (results.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 col-span-3 text-center">No products found for "${query}".</p>`;
+    return;
+  }
+
+  results.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card border p-4 rounded shadow text-center bg-white";
+    card.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" class="h-40 mx-auto object-contain mb-3">
+      <h3 class="font-bold">${p.name}</h3>
+      <p class="text-sm text-gray-600 mb-1">Category: ${p.category}</p>
+      <p class="text-lg font-semibold text-blue-700 mb-1">${p.price}</p>
+      <span class="inline-block bg-red-500 text-white text-xs px-2 py-1 rounded-full">🔥 Offer</span>
+      <div class="flex justify-center gap-2 mt-2">
+        <button onclick='addToCart(${JSON.stringify(p)})' class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">🛒 Add to Cart</button>
+        <a href="${p.link}" target="_blank">
+          <button onclick="playSound()" class="bg-yellow-400 px-3 py-1 rounded hover:bg-yellow-500 text-sm">Buy Now</button>
+        </a>
+        <button onclick="shareProduct('${p.name}', '${p.link}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">🔗 Share</button>
+      </div>
+      <p class="text-sm text-yellow-600 mt-1">🌟 Rated 4.5/5 by 200+ users</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+
+
+function backToHome() {
+  document.getElementById("searchResults").classList.add("hidden");
+  document.getElementById("productGrid").classList.remove("hidden");
+  document.getElementById("searchInput").value = "";
+  renderProducts();
+}
+
+// 🔎 Trigger search on Enter key
+document.getElementById("searchInput").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    searchProducts();
+  }
+});
+
+const cart = [];
+
+function addToCart(product) {
+  const existing = cart.find(item => item.name === product.name);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+  alert(`${product.name} added to cart!`);
+}
+
+function openCart() {
+  const modal = document.getElementById("cartModal");
+  const container = document.getElementById("cartItems");
+  container.innerHTML = "";
+
+  if (cart.length === 0) {
+    container.innerHTML = "<p>No items in cart.</p>";
+  } else {
+    cart.forEach((item, index) => {
+      container.innerHTML += `
+        <div class="border-b pb-3 mb-3">
+          <p class="font-semibold">${item.name}</p>
+          <p class="text-sm text-gray-600">${item.price}</p>
+          <div class="flex items-center gap-3 mt-2 flex-wrap">
+          <button onclick="updateQuantity(${index}, -1)" class="bg-gray-300 px-2 rounded">−</button>
+          <span>${item.quantity}</span>
+          <button onclick="updateQuantity(${index}, 1)" class="bg-gray-300 px-2 rounded">+</button>
+          <a href="${item.link}" target="_blank" onclick="playSound()" class="bg-yellow-400 px-3 py-1 rounded hover:bg-yellow-500 text-sm text-black">Buy Now</a>
+          <button onclick="removeItem(${index})" class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600">🗑 Remove</button>
+        </div>
+
+        </div>`;
+    });
+
+    // Cart total
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    container.innerHTML += `<div class="mt-4 font-bold text-right">Total Items: ${totalItems}</div>`;
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function updateQuantity(index, change) {
+  cart[index].quantity += change;
+  if (cart[index].quantity <= 0) {
+    cart.splice(index, 1);
+  }
+  openCart(); // Re-render
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  openCart(); // Re-render
+}
+
+function closeCart() {
+  document.getElementById("cartModal").classList.add("hidden");
+}
+
+function openProfile() {
+  const userData = JSON.parse(localStorage.getItem("flashUser"));
+  if (userData) {
+    document.getElementById("profileName").textContent = userData.name || "Guest";
+    document.getElementById("profileMobile").textContent = userData.mobile || "N/A";
+  }
+  document.getElementById("profileModal").classList.remove("hidden");
+}
+
+function closeProfile() {
+  document.getElementById("profileModal").classList.add("hidden");
+}
+
+function shareProduct(name, link) {
+  const shareText = `${name} - Check this out: ${link}`;
+  navigator.clipboard.writeText(shareText);
+  alert("Product link copied to clipboard!");
+}
+
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log("✅ Service Worker registered:", reg);
+      }).catch(err => {
+        console.error("❌ Service Worker registration failed:", err);
+      });
+    });
+  }
+</script>
+
+
+</body>
+</html>
